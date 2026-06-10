@@ -1,0 +1,107 @@
+@use '@/styles/variables.scss' as *;
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-md $page-padding;
+  background: $color-bg-card;
+  position: relative;
+}
+
+.image {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  margin-left: $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.name {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.spec {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4rpx;
+}
+
+.price {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+}
+
+.qtyCtrl {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.qtyBtn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: $color-bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-primary-light;
+    opacity: 0.8;
+  }
+}
+
+.qtyIcon {
+  font-size: 28rpx;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.qty {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  min-width: 40rpx;
+  text-align: center;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 8rpx;
+  right: $page-padding;
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.removeIcon {
+  font-size: 32rpx;
+  color: $color-text-disabled;
+}

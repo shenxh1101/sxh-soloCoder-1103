@@ -1,0 +1,187 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 160rpx;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  margin: $spacing-md $page-padding;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  padding: $spacing-md $page-padding $spacing-sm;
+}
+
+.orderTypeRow {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-md;
+}
+
+.typeBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  background: $color-bg-page;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.typeBtnActive {
+  background: $color-tag-bg;
+  border-color: $color-primary;
+}
+
+.typeIcon {
+  font-size: 32rpx;
+}
+
+.typeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.typeTextActive {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.remarkInput {
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+}
+
+.remarkPlaceholder {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}
+
+.remarkTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  padding: 0 $page-padding $spacing-sm;
+}
+
+.couponSelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+}
+
+.couponLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.couponValue {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.couponArrow {
+  font-size: 24rpx;
+  color: $color-text-tertiary;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+  box-shadow: $shadow-float;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.totalInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.totalLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.totalPrice {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+}
+
+.submitBtn {
+  padding: 20rpx 48rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  border: none;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  @include button-reset;
+  height: auto;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.couponList {
+  padding: 0 $page-padding;
+  max-height: 600rpx;
+  overflow-y: auto;
+}
+
+.couponSection {
+  margin-top: $spacing-md;
+}
+
+.couponSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding $spacing-sm;
+}
+
+.clearCouponBtn {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  padding: 4rpx 12rpx;
+}
+
+.couponDetail {
+  font-size: $font-size-sm;
+  color: $color-success;
+  padding: $spacing-md $page-padding;
+}
+
+.couponDetailValue {
+  font-weight: $font-weight-bold;
+}

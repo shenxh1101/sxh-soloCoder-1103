@@ -1,0 +1,108 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $color-divider;
+  margin-bottom: $spacing-sm;
+}
+
+.orderNo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.status {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.itemPrice {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.moreItems {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $color-divider;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.typeTag {
+  background: $color-tag-bg;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+}
+
+.typeText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  font-weight: $font-weight-medium;
+}
+
+.remark {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  max-width: 200rpx;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.discount {
+  font-size: $font-size-xs;
+  color: $color-success;
+}
+
+.finalPrice {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+}

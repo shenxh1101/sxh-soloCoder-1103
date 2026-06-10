@@ -1,0 +1,103 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 100rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: calc(env(safe-area-inset-top) + 48rpx) $page-padding 48rpx;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.brand {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: $radius-button;
+  padding: 16rpx 24rpx;
+  margin-top: $spacing-md;
+  gap: 12rpx;
+}
+
+.searchIcon {
+  font-size: 28rpx;
+}
+
+.searchPlaceholder {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.banner {
+  margin: $spacing-md $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 280rpx;
+}
+
+.bannerContent {
+  padding: $spacing-sm $spacing-md $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bannerTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.bannerDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.bannerBadge {
+  background: $color-tag-bg;
+  padding: 8rpx 20rpx;
+  border-radius: $radius-button;
+}
+
+.bannerBadgeText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  font-weight: $font-weight-semibold;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: $spacing-sm $page-padding;
+  gap: $spacing-sm;
+}
+
+.gridItem {
+  width: calc(50% - 12rpx);
+}

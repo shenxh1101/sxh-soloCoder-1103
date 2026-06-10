@@ -1,0 +1,47 @@
+@use '@/styles/variables.scss' as *;
+
+.wrapper {
+  background: $color-bg-card;
+  padding: $spacing-sm 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.scrollContainer {
+  display: flex;
+  white-space: nowrap;
+  padding: 0 $page-padding;
+}
+
+.tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 24rpx;
+  margin-right: 8rpx;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+  min-width: 120rpx;
+}
+
+.tabIcon {
+  font-size: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.tabText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.active {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+
+  .tabText {
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+  }
+}

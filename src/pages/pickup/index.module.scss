@@ -1,0 +1,282 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-success 0%, #00C853 100%);
+  padding: 48rpx $page-padding;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.queueSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.queueLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.queueNo {
+  font-size: 96rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: 1.2;
+}
+
+.queueSuffix {
+  font-size: $font-size-md;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: $font-weight-medium;
+}
+
+.waitSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.waitLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.waitTime {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.waitUnit {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.statusBar {
+  margin: 0 $page-padding;
+  margin-top: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.orderInfo {
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+  margin-bottom: $spacing-md;
+}
+
+.orderNo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 8rpx;
+}
+
+.orderType {
+  display: inline-flex;
+  padding: 4rpx 16rpx;
+  background: $color-tag-bg;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  font-weight: $font-weight-medium;
+}
+
+.steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 24rpx;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.stepDot {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: $radius-round;
+  background: $color-divider;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+}
+
+.stepDotActive {
+  background: $color-success;
+}
+
+.stepDotCurrent {
+  background: $color-success;
+  box-shadow: 0 0 0 8rpx rgba(0, 180, 42, 0.15);
+}
+
+.stepDotCheck {
+  color: $color-text-white;
+  font-size: 18rpx;
+  font-weight: $font-weight-bold;
+}
+
+.stepText {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stepTextActive {
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.progressLine {
+  position: absolute;
+  top: 16rpx;
+  left: 60rpx;
+  right: 60rpx;
+  height: 4rpx;
+  background: $color-divider;
+  z-index: 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: $color-success;
+  border-radius: 2rpx;
+  transition: width 0.5s ease;
+}
+
+.itemsSection {
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.itemsTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  padding: $spacing-md $page-padding;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $page-padding;
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemImage {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.itemName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.itemPrice {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.priceSummary {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+  border-top: 1rpx solid $color-divider;
+}
+
+.totalLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.totalValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+}
+
+.remarkSection {
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.remarkIcon {
+  font-size: 28rpx;
+}
+
+.remarkText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.cancelBtn {
+  margin: $spacing-md $page-padding;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  border: 1rpx solid $color-border;
+  background: $color-bg-card;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.notFound {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx $page-padding;
+}
+
+.notFoundText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

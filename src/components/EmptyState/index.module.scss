@@ -1,0 +1,46 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+}
+
+.icon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  text-align: center;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  margin-top: 8rpx;
+}
+
+.actionBtn {
+  margin-top: $spacing-md;
+  padding: 16rpx 48rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-button;
+  border: none;
+  @include button-reset;
+  height: auto;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
