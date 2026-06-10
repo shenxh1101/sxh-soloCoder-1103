@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { View, Text, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import classnames from 'classnames'
@@ -9,7 +9,6 @@ import CartItem from '@/components/CartItem'
 import CouponCard from '@/components/CouponCard'
 import EmptyState from '@/components/EmptyState'
 import { formatPrice } from '@/utils'
-import { OrderType } from '@/types'
 
 const CartPage: React.FC = () => {
   const {
@@ -17,6 +16,7 @@ const CartPage: React.FC = () => {
     orderType,
     remark,
     selectedCouponId,
+    usedCouponIds,
     getCartTotal,
     updateQuantity,
     removeFromCart,
@@ -39,9 +39,17 @@ const CartPage: React.FC = () => {
 
   const availableCoupons = useMemo(() => {
     return coupons.filter(
-      (c) => !c.isUsed && new Date(c.expiredAt) > new Date() && total >= c.minOrderAmount
+      (c) => !c.isUsed && !usedCouponIds.includes(c.id) && new Date(c.expiredAt) > new Date() && total >= c.minOrderAmount
     )
-  }, [total])
+  }, [total, usedCouponIds])
+
+  useEffect(() => {
+    if (selectedCouponId && selectedCoupon) {
+      if (total < selectedCoupon.minOrderAmount || usedCouponIds.includes(selectedCouponId)) {
+        selectCoupon('')
+      }
+    }
+  }, [total, selectedCouponId, selectedCoupon, usedCouponIds, selectCoupon])
 
   const handleMinus = (id: string) => {
     const item = cartItems.find((ci) => ci.id === id)

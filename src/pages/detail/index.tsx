@@ -11,7 +11,7 @@ import { formatPrice } from '@/utils'
 const DetailPage: React.FC = () => {
   const router = useRouter()
   const { id } = router.params
-  const { addToCart, toggleFavorite, isFavorite } = useStore()
+  const { addToCart, toggleFavorite, isFavorite, soldOutIds } = useStore()
 
   const dish = useMemo(() => dishes.find((d) => d.id === id), [id])
 
@@ -28,6 +28,7 @@ const DetailPage: React.FC = () => {
     )
   }
 
+  const isSold = dish.isSoldOut || soldOutIds.includes(dish.id)
   const selectedSpec = dish.specs.find((s) => s.id === selectedSpecId) || dish.specs[0]
   const extraPrice = dish.extras
     .filter((e) => selectedExtraIds.includes(e.id))
@@ -35,7 +36,7 @@ const DetailPage: React.FC = () => {
   const totalPrice = (selectedSpec.price + extraPrice) * quantity
 
   const handleAddToCart = () => {
-    if (dish.isSoldOut) return
+    if (isSold) return
 
     const extraNames = dish.extras
       .filter((e) => selectedExtraIds.includes(e.id))
@@ -64,7 +65,7 @@ const DetailPage: React.FC = () => {
         <View className={styles.imageTags}>
           {dish.isHot && <View className={styles.hotTag}>热卖</View>}
           {dish.isNew && <View className={styles.newTag}>新品</View>}
-          {dish.isSoldOut && <View className={styles.soldOutTag}>已售罄</View>}
+          {isSold && <View className={styles.soldOutTag}>已售罄</View>}
         </View>
         <View
           className={styles.favBtn}
@@ -150,11 +151,11 @@ const DetailPage: React.FC = () => {
           </View>
         </View>
         <View
-          className={classnames(styles.addBtn, dish.isSoldOut && styles.addBtnDisabled)}
+          className={classnames(styles.addBtn, isSold && styles.addBtnDisabled)}
           onClick={handleAddToCart}
         >
           <Text className={styles.addBtnText}>
-            {dish.isSoldOut ? '已售罄' : added ? '已加入，再加一份' : '加入购物车'}
+            {isSold ? '已售罄' : added ? '已加入，再加一份' : '加入购物车'}
           </Text>
           <Text className={styles.currentPrice}>{formatPrice(totalPrice)}</Text>
         </View>

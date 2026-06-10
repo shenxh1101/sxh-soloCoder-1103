@@ -4,7 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import classnames from 'classnames'
 import styles from './index.module.scss'
 import { useStore } from '@/store/useStore'
-import { formatPrice, getStatusLabel } from '@/utils'
+import { formatPrice } from '@/utils'
 
 const stepList = [
   { key: 'pending', label: '待确认' },
@@ -17,7 +17,7 @@ const stepList = [
 const PickupPage: React.FC = () => {
   const router = useRouter()
   const { orderId } = router.params
-  const { orders } = useStore()
+  const { orders, updateOrderStatus } = useStore()
 
   const order = useMemo(() => {
     return orders.find((o) => o.id === orderId) || orders[0]
@@ -34,19 +34,44 @@ const PickupPage: React.FC = () => {
   }
 
   const currentStepIndex = stepList.findIndex((s) => s.key === order.orderStatus)
+  const isActive = order.orderStatus !== 'completed' && order.orderStatus !== 'cancelled'
+  const headerBgColor = order.orderStatus === 'completed'
+    ? 'linear-gradient(135deg, #86909C 0%, #C9CDD4 100%)'
+    : order.orderStatus === 'cancelled'
+      ? 'linear-gradient(135deg, #F53F3F 0%, #FF7875 100%)'
+      : 'linear-gradient(135deg, #00B42A 0%, #00C853 100%)'
+
+  const handleCancel = () => {
+    updateOrderStatus(order.id, 'cancelled')
+    Taro.showToast({ title: '订单已取消', icon: 'none' })
+  }
 
   return (
     <View className={styles.page}>
-      <View className={styles.header}>
+      <View className={styles.header} style={{ background: headerBgColor }}>
         <View className={styles.queueSection}>
           <Text className={styles.queueLabel}>排队号</Text>
-          <Text className={styles.queueNo}>{order.queueNo}</Text>
-          <Text className={styles.queueSuffix}>号</Text>
+          <Text className={styles.queueNo}>{order.orderStatus === 'cancelled' ? '—' : order.queueNo}</Text>
+          <Text className={styles.queueSuffix}>{order.orderStatus === 'cancelled' ? '' : '号'}</Text>
         </View>
         <View className={styles.waitSection}>
-          <Text className={styles.waitLabel}>预计等待</Text>
-          <Text className={styles.waitTime}>{order.estimatedWaitTime}</Text>
-          <Text className={styles.waitUnit}>分钟</Text>
+          <Text className={styles.waitLabel}>
+            {order.orderStatus === 'completed'
+              ? '取餐完毕'
+              : order.orderStatus === 'cancelled'
+                ? '已取消'
+                : '预计等待'}
+          </Text>
+          <Text className={styles.waitTime}>
+            {order.orderStatus === 'completed'
+              ? '✓'
+              : order.orderStatus === 'cancelled'
+                ? '✕'
+                : order.estimatedWaitTime}
+          </Text>
+          <Text className={styles.waitUnit}>
+            {order.orderStatus === 'completed' || order.orderStatus === 'cancelled' ? '' : '分钟'}
+          </Text>
         </View>
       </View>
 
@@ -73,7 +98,8 @@ const PickupPage: React.FC = () => {
                 className={classnames(
                   styles.stepDot,
                   idx < currentStepIndex && styles.stepDotActive,
-                  idx === currentStepIndex && styles.stepDotCurrent
+                  idx === currentStepIndex && styles.stepDotCurrent,
+                  order.orderStatus === 'cancelled' && idx === currentStepIndex && styles.stepDotCancelled
                 )}
               >
                 {idx < currentStepIndex && <Text className={styles.stepDotCheck}>✓</Text>}
@@ -120,8 +146,8 @@ const PickupPage: React.FC = () => {
         </View>
       )}
 
-      {order.orderStatus !== 'completed' && order.orderStatus !== 'cancelled' && (
-        <View className={styles.cancelBtn}>
+      {isActive && (
+        <View className={styles.cancelBtn} onClick={handleCancel}>
           <Text>取消订单</Text>
         </View>
       )}

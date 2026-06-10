@@ -6,14 +6,12 @@ import styles from './index.module.scss'
 import { useStore } from '@/store/useStore'
 import { dishes } from '@/data/dishes'
 import { formatPrice, getStatusColor, getStatusLabel } from '@/utils'
-import { OrderStatus } from '@/types'
 
 type StaffTab = 'pending' | 'all' | 'sales' | 'soldout'
 
 const StaffPage: React.FC = () => {
-  const { orders, updateOrderStatus } = useStore()
+  const { orders, updateOrderStatus, soldOutIds, toggleSoldOut } = useStore()
   const [activeTab, setActiveTab] = useState<StaffTab>('pending')
-  const [soldOutIds, setSoldOutIds] = useState<string[]>(['12'])
 
   const pendingOrders = useMemo(() => {
     return orders.filter((o) => o.orderStatus === 'pending')
@@ -61,15 +59,14 @@ const StaffPage: React.FC = () => {
     Taro.showToast({ title: '已通知取餐', icon: 'success' })
   }
 
+  const handleComplete = (orderId: string) => {
+    updateOrderStatus(orderId, 'completed')
+    Taro.showToast({ title: '已完成取餐', icon: 'success' })
+  }
+
   const handleCancel = (orderId: string) => {
     updateOrderStatus(orderId, 'cancelled')
     Taro.showToast({ title: '已取消', icon: 'none' })
-  }
-
-  const toggleSoldOut = (dishId: string) => {
-    setSoldOutIds((prev) =>
-      prev.includes(dishId) ? prev.filter((id) => id !== dishId) : [...prev, dishId]
-    )
   }
 
   const renderOrderCard = (order: typeof orders[0], showActions: boolean) => (
@@ -147,6 +144,14 @@ const StaffPage: React.FC = () => {
               onClick={() => handleReady(order.id)}
             >
               <Text>通知取餐</Text>
+            </View>
+          )}
+          {order.orderStatus === 'ready' && (
+            <View
+              className={classnames(styles.actionBtn, styles.btnConfirm)}
+              onClick={() => handleComplete(order.id)}
+            >
+              <Text>已取餐 / 完成</Text>
             </View>
           )}
         </View>

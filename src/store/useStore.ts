@@ -21,6 +21,8 @@ interface StoreState {
   orderType: OrderType
   remark: string
   isStaffMode: boolean
+  soldOutIds: string[]
+  usedCouponIds: string[]
 
   addToCart: (item: Omit<CartDishItem, 'id'>) => void
   removeFromCart: (id: string) => void
@@ -37,6 +39,8 @@ interface StoreState {
   addReview: (review: Omit<Review, 'id' | 'createdAt'>) => void
   toggleStaffMode: () => void
   updateOrderStatus: (orderId: string, status: Order['orderStatus']) => void
+  toggleSoldOut: (dishId: string) => void
+  isSoldOut: (dishId: string) => boolean
 }
 
 export const useStore = create<StoreState>((set, get) => ({
@@ -48,6 +52,8 @@ export const useStore = create<StoreState>((set, get) => ({
   orderType: 'dine_in',
   remark: '',
   isStaffMode: false,
+  soldOutIds: ['12'],
+  usedCouponIds: [],
 
   addToCart: (item) => {
     set((state) => {
@@ -135,11 +141,16 @@ export const useStore = create<StoreState>((set, get) => ({
       createdAt: new Date().toISOString(),
     }
 
+    const usedCouponIds = state.selectedCouponId
+      ? [...state.usedCouponIds, state.selectedCouponId]
+      : state.usedCouponIds
+
     set((s) => ({
       orders: [order, ...s.orders],
       cartItems: [],
       selectedCouponId: '',
       remark: '',
+      usedCouponIds,
     }))
 
     return order
@@ -175,4 +186,14 @@ export const useStore = create<StoreState>((set, get) => ({
       ),
     }))
   },
+
+  toggleSoldOut: (dishId) => {
+    set((state) => ({
+      soldOutIds: state.soldOutIds.includes(dishId)
+        ? state.soldOutIds.filter((id) => id !== dishId)
+        : [...state.soldOutIds, dishId],
+    }))
+  },
+
+  isSoldOut: (dishId) => get().soldOutIds.includes(dishId),
 }))

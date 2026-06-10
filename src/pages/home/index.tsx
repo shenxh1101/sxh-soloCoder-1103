@@ -10,7 +10,7 @@ import EmptyState from '@/components/EmptyState'
 
 const HomePage: React.FC = () => {
   const [activeCategoryId, setActiveCategoryId] = useState('1')
-  const { favoriteIds, toggleFavorite } = useStore()
+  const { favoriteIds, toggleFavorite, soldOutIds } = useStore()
 
   usePullDownRefresh(() => {
     setTimeout(() => {
@@ -70,16 +70,19 @@ const HomePage: React.FC = () => {
 
       {filteredDishes.length > 0 ? (
         <View className={styles.grid}>
-          {filteredDishes.map((dish) => (
-            <View key={dish.id} className={styles.gridItem}>
-              <DishCard
-                dish={dish}
-                isFavorite={favoriteIds.includes(dish.id)}
-                onClick={handleDishClick}
-                onFavorite={toggleFavorite}
-              />
-            </View>
-          ))}
+          {filteredDishes.map((dish) => {
+            const isSold = dish.isSoldOut || soldOutIds.includes(dish.id)
+            return (
+              <View key={dish.id} className={styles.gridItem}>
+                <DishCard
+                  dish={{ ...dish, isSoldOut: isSold }}
+                  isFavorite={favoriteIds.includes(dish.id)}
+                  onClick={handleDishClick}
+                  onFavorite={toggleFavorite}
+                />
+              </View>
+            )
+          })}
         </View>
       ) : (
         <EmptyState icon="🍽️" title="该分类暂无菜品" />

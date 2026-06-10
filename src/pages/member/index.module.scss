@@ -184,3 +184,124 @@
 .favoriteGridItem {
   width: calc(50% - 12rpx);
 }
+
+.reviewForm {
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.reviewFormTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.starRow {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: $spacing-md;
+}
+
+.starBtn {
+  font-size: 44rpx;
+  color: $color-text-disabled;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(1.15);
+  }
+}
+
+.starBtnActive {
+  color: $color-accent;
+}
+
+.reviewInput {
+  background: $color-bg-card;
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-md;
+}
+
+.reviewInputPlaceholder {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}
+
+.reviewActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+}
+
+.reviewCancelBtn {
+  padding: 12rpx 32rpx;
+  border-radius: $radius-button;
+  border: 1rpx solid $color-border;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.reviewSubmitBtn {
+  padding: 12rpx 32rpx;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.reviewTriggerRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-xs;
+  gap: $spacing-sm;
+}
+
+.reviewTriggerImg {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.reviewTriggerName {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.reviewTriggerBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-button;
+  border: 1rpx solid $color-primary;
+  flex-shrink: 0;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.reviewTriggerBtnText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}

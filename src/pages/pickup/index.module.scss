@@ -128,6 +128,11 @@
   box-shadow: 0 0 0 8rpx rgba(0, 180, 42, 0.15);
 }
 
+.stepDotCancelled {
+  background: $color-error;
+  box-shadow: 0 0 0 8rpx rgba(245, 63, 63, 0.15);
+}
+
 .stepDotCheck {
   color: $color-text-white;
   font-size: 18rpx;
