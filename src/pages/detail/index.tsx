@@ -1,17 +1,18 @@
 import React, { useState, useMemo } from 'react'
-import { View, Text, Image } from '@tarojs/components'
+import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
 import classnames from 'classnames'
 import styles from './index.module.scss'
 import { dishes } from '@/data/dishes'
 import { useStore } from '@/store/useStore'
 import SpecSelector from '@/components/SpecSelector'
+import ReviewCard from '@/components/ReviewCard'
 import { formatPrice } from '@/utils'
 
 const DetailPage: React.FC = () => {
   const router = useRouter()
   const { id } = router.params
-  const { addToCart, toggleFavorite, isFavorite, soldOutIds } = useStore()
+  const { addToCart, toggleFavorite, isFavorite, soldOutIds, reviews } = useStore()
 
   const dish = useMemo(() => dishes.find((d) => d.id === id), [id])
 
@@ -19,6 +20,16 @@ const DetailPage: React.FC = () => {
   const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([])
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
+
+  const dishReviews = useMemo(() => {
+    return reviews.filter((r) => r.dishId === id)
+  }, [reviews, id])
+
+  const avgRating = useMemo(() => {
+    if (dishReviews.length === 0) return 0
+    const sum = dishReviews.reduce((s, r) => s + r.rating, 0)
+    return Math.round((sum / dishReviews.length) * 10) / 10
+  }, [dishReviews])
 
   if (!dish) {
     return (
@@ -59,7 +70,7 @@ const DetailPage: React.FC = () => {
   }
 
   return (
-    <View className={styles.page}>
+    <ScrollView scrollY className={styles.page}>
       <View className={styles.imageWrap}>
         <Image className={styles.heroImage} src={dish.image} mode="aspectFill" />
         <View className={styles.imageTags}>
@@ -134,31 +145,60 @@ const DetailPage: React.FC = () => {
         }}
       />
 
-      <View className={styles.bottomBar}>
-        <View className={styles.qtyCtrl}>
-          <View
-            className={styles.qtyBtn}
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-          >
-            <Text>−</Text>
+      {dishReviews.length > 0 && (
+        <View className={styles.reviewsSection}>
+          <View className={styles.reviewsHeader}>
+            <Text className={styles.reviewsTitle}>会员口碑</Text>
+            <View className={styles.reviewsSummary}>
+              <Text className={styles.reviewsAvg}>{avgRating}</Text>
+              <Text className={styles.reviewsCount}>{dishReviews.length}条评价</Text>
+            </View>
           </View>
-          <Text className={styles.qty}>{quantity}</Text>
-          <View
-            className={styles.qtyBtn}
-            onClick={() => setQuantity(quantity + 1)}
-          >
-            <Text>+</Text>
-          </View>
+          {dishReviews.map((r) => (
+            <View key={r.id} className={styles.reviewItem}>
+              <View className={styles.reviewItemHeader}>
+                <View className={styles.reviewStars}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Text
+                      key={s}
+                      className={styles.reviewStar}
+                      style={{ color: s <= r.rating ? '#FFB347' : '#E5E6EB' }}
+                    >
+                      ★
+                    </Text>
+                  ))}
+                </View>
+                <Text className={styles.reviewDate}>{r.createdAt.slice(0, 10)}</Text>
+              </View>
+              <Text className={styles.reviewContent}>{r.content}</Text>
+            </View>
+          ))}
         </View>
-        <View
-          className={classnames(styles.addBtn, isSold && styles.addBtnDisabled)}
-          onClick={handleAddToCart}
-        >
-          <Text className={styles.addBtnText}>
-            {isSold ? '已售罄' : added ? '已加入，再加一份' : '加入购物车'}
-          </Text>
+      )}
+
+      <View style={{ height: 160 }} />
+    </ScrollView>
+
+    <View className={styles.bottomBar}>
+      <View className={styles.qtyCtrl}>
+        <View className={styles.qtyBtn} onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+          <Text>-</Text>
+        </View>
+        <Text className={styles.qty}>{quantity}</Text>
+        <View className={styles.qtyBtn} onClick={() => setQuantity(quantity + 1)}>
+          <Text>+</Text>
+        </View>
+      </View>
+      <View
+        className={`${styles.addBtn} ${isSold ? styles.addBtnDisabled : ''}`}
+        onClick={handleAddToCart}
+      >
+        <Text className={styles.addBtnText}>
+          {isSold ? '已售罄' : '加入购物车'}
+        </Text>
+        {!isSold && (
           <Text className={styles.currentPrice}>{formatPrice(totalPrice)}</Text>
-        </View>
+        )}
       </View>
     </View>
   )

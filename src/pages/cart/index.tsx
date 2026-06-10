@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import styles from './index.module.scss'
 import { useStore } from '@/store/useStore'
 import { coupons } from '@/data/coupons'
+import { dishes } from '@/data/dishes'
 import CartItem from '@/components/CartItem'
 import CouponCard from '@/components/CouponCard'
 import EmptyState from '@/components/EmptyState'
@@ -17,6 +18,8 @@ const CartPage: React.FC = () => {
     remark,
     selectedCouponId,
     usedCouponIds,
+    collectedCouponIds,
+    balance,
     getCartTotal,
     updateQuantity,
     removeFromCart,
@@ -27,32 +30,73 @@ const CartPage: React.FC = () => {
   } = useStore()
 
   const [showCoupons, setShowCoupons] = useState(false)
+  const [useBalance, setUseBalance] = useState(0)
+  const [showBalanceInput, setShowBalanceInput] = useState(false)
 
   const total = getCartTotal()
+  const cartCategoryIds = useMemo(() => {
+    const ids = new Set<string>()
+    cartItems.forEach((ci) => {
+      const dish = dishes.find((d) => d.id === ci.dishId)
+      if (dish) ids.add(dish.categoryId)
+    })
+    return ids
+  }, [cartItems])
 
   const selectedCoupon = useMemo(() => {
     return coupons.find((c) => c.id === selectedCouponId) || null
   }, [selectedCouponId])
 
   const discountAmount = selectedCoupon ? selectedCoupon.discountAmount : 0
-  const finalPrice = Math.max(0, total - discountAmount)
+  const afterDiscount = Math.max(0, total - discountAmount)
+  const finalPrice = Math.max(0, afterDiscount - useBalance)
 
-  const availableCoupons = useMemo(() => {
+  const allAvailableCoupons = useMemo(() => {
     return coupons.filter(
       (c) =>
         !c.isUsed &&
         !usedCouponIds.includes(c.id) &&
-        new Date(c.expiredAt) > new Date()
+        new Date(c.expiredAt) > new Date() &&
+        collectedCouponIds.includes(c.id)
     )
-  }, [usedCouponIds])
+  }, [usedCouponIds, collectedCouponIds])
+
+  const matchingCoupons = useMemo(() => {
+    return allAvailableCoupons.filter((c) => {
+      if (c.couponType === 'all') return true
+      if (c.couponType === 'category' && c.categoryId) {
+        return cartCategoryIds.has(c.categoryId)
+      }
+      return false
+    })
+  }, [allAvailableCoupons, cartCategoryIds])
+
+  const nonMatchingCoupons = useMemo(() => {
+    return allAvailableCoupons.filter((c) => {
+      const isMatching = matchingCoupons.some((m) => m.id === c.id)
+      return !isMatching
+    })
+  }, [allAvailableCoupons, matchingCoupons])
 
   useEffect(() => {
     if (selectedCouponId && selectedCoupon) {
-      if (total < selectedCoupon.minOrderAmount || usedCouponIds.includes(selectedCouponId)) {
+      if (
+        total < selectedCoupon.minOrderAmount ||
+        usedCouponIds.includes(selectedCouponId) ||
+        (selectedCoupon.couponType === 'category' &&
+          selectedCoupon.categoryId &&
+          !cartCategoryIds.has(selectedCoupon.categoryId))
+      ) {
         selectCoupon('')
       }
     }
-  }, [total, selectedCouponId, selectedCoupon, usedCouponIds, selectCoupon])
+  }, [total, selectedCouponId, selectedCoupon, usedCouponIds, selectCoupon, cartCategoryIds])
+
+  useEffect(() => {
+    if (useBalance > afterDiscount) {
+      setUseBalance(afterDiscount)
+    }
+  }, [useBalance, afterDiscount])
 
   const handleMinus = (id: string) => {
     const item = cartItems.find((ci) => ci.id === id)
@@ -73,8 +117,7 @@ const CartPage: React.FC = () => {
       Taro.showToast({ title: '请先添加菜品', icon: 'none' })
       return
     }
-
-    const order = submitOrder(selectedCoupon)
+    const order = submitOrder(selectedCoupon, useBalance)
     Taro.showToast({ title: '下单成功！', icon: 'success' })
     Taro.navigateTo({
       url: `/pages/pickup/index?orderId=${order.id}`,
@@ -85,6 +128,14 @@ const CartPage: React.FC = () => {
     const isUsed = coupon.isUsed || usedCouponIds.includes(coupon.id)
     const isExpired = new Date(coupon.expiredAt) < new Date()
     if (isUsed || isExpired) return
+
+    if (
+      coupon.couponType === 'category' &&
+      coupon.categoryId &&
+      !cartCategoryIds.has(coupon.categoryId)
+    ) {
+      return
+    }
 
     if (total < coupon.minOrderAmount) {
       Taro.showToast({
@@ -99,6 +150,16 @@ const CartPage: React.FC = () => {
     } else {
       selectCoupon(coupon.id)
     }
+  }
+
+  const getDisabledReason = (coupon: typeof coupons[0]): string => {
+    if (coupon.couponType === 'category' && coupon.categoryId && !cartCategoryIds.has(coupon.categoryId)) {
+      return `限${coupon.categoryName || '指定品类'}使用`
+    }
+    if (total < coupon.minOrderAmount) {
+      return `还差${formatPrice(coupon.minOrderAmount - total)}`
+    }
+    return ''
   }
 
   return (
@@ -165,7 +226,9 @@ const CartPage: React.FC = () => {
               <Text className={styles.couponLabel}>优惠券</Text>
               <View className={styles.couponValue}>
                 <Text className={styles.couponDetail}>
-                  {selectedCoupon ? `已选 -¥${selectedCoupon.discountAmount}` : `${availableCoupons.length}张可用`}
+                  {selectedCoupon
+                    ? `已选 -¥${selectedCoupon.discountAmount}`
+                    : `${matchingCoupons.length}张可用`}
                 </Text>
                 <Text className={styles.couponArrow}>›</Text>
               </View>
@@ -173,19 +236,73 @@ const CartPage: React.FC = () => {
 
             {showCoupons && (
               <View className={styles.couponList}>
-                {availableCoupons.length > 0 ? (
-                  availableCoupons.map((c) => (
-                    <CouponCard
-                      key={c.id}
-                      coupon={c}
-                      selected={c.id === selectedCouponId}
-                      onSelect={handleCouponSelect}
-                      totalPrice={total}
-                      usedCouponIds={usedCouponIds}
-                    />
-                  ))
-                ) : (
+                {matchingCoupons.length > 0 && (
+                  <>
+                    {matchingCoupons.map((c) => (
+                      <CouponCard
+                        key={c.id}
+                        coupon={c}
+                        selected={c.id === selectedCouponId}
+                        onSelect={handleCouponSelect}
+                        totalPrice={total}
+                        usedCouponIds={usedCouponIds}
+                      />
+                    ))}
+                  </>
+                )}
+                {nonMatchingCoupons.length > 0 && (
+                  <>
+                    <Text className={styles.couponSectionLabel}>不可用</Text>
+                    {nonMatchingCoupons.map((c) => (
+                      <CouponCard
+                        key={c.id}
+                        coupon={c}
+                        totalPrice={total}
+                        usedCouponIds={usedCouponIds}
+                        disabledReason={getDisabledReason(c)}
+                        showDisabledReason
+                      />
+                    ))}
+                  </>
+                )}
+                {allAvailableCoupons.length === 0 && (
                   <EmptyState icon="🎫" title="暂无可用优惠券" />
+                )}
+              </View>
+            )}
+          </View>
+
+          <View className={styles.section}>
+            <Text className={styles.sectionTitle}>余额抵扣</Text>
+            <View className={styles.balanceInfo}>
+              <Text className={styles.balanceLabel}>
+                储值余额：{formatPrice(balance)}
+              </Text>
+              <View
+                className={classnames(styles.toggleSwitch, showBalanceInput && styles.toggleSwitchOn)}
+                onClick={() => {
+                  setShowBalanceInput(!showBalanceInput)
+                  if (showBalanceInput) setUseBalance(0)
+                }}
+              >
+                <View className={classnames(styles.toggleDot, showBalanceInput && styles.toggleDotOn)} />
+              </View>
+            </View>
+            {showBalanceInput && balance > 0 && (
+              <View className={styles.balanceInputRow}>
+                <Input
+                  className={styles.balanceInput}
+                  type="number"
+                  placeholder={`最多可用${formatPrice(Math.min(balance, afterDiscount))}`}
+                  placeholderClass={styles.remarkPlaceholder}
+                  value={useBalance > 0 ? String(useBalance) : ''}
+                  onInput={(e) => {
+                    const val = Number(e.detail.value)
+                    setUseBalance(Math.min(val, balance, afterDiscount))
+                  }}
+                />
+                {useBalance > 0 && (
+                  <Text className={styles.balanceHint}>抵扣{formatPrice(useBalance)}</Text>
                 )}
               </View>
             )}
@@ -193,9 +310,18 @@ const CartPage: React.FC = () => {
 
           <View className={styles.bottomBar}>
             <View className={styles.totalInfo}>
+              {discountAmount > 0 && (
+                <Text className={styles.totalSub}>
+                  优惠券 -¥{discountAmount}
+                </Text>
+              )}
+              {useBalance > 0 && (
+                <Text className={styles.totalSub}>
+                  余额 -{formatPrice(useBalance)}
+                </Text>
+              )}
               <Text className={styles.totalLabel}>
                 共{cartItems.reduce((s, i) => s + i.quantity, 0)}件
-                {discountAmount > 0 ? `（已优惠¥${discountAmount}）` : ''}
               </Text>
               <Text className={styles.totalPrice}>{formatPrice(finalPrice)}</Text>
             </View>

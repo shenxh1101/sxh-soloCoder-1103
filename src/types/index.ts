@@ -61,6 +61,7 @@ export interface CartDishItem {
 
 export type OrderType = 'dine_in' | 'takeout'
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled'
+export type RefundStatus = 'pending' | 'approved' | 'rejected' | 'completed'
 
 export interface Order {
   id: string
@@ -68,16 +69,23 @@ export interface Order {
   items: CartDishItem[]
   totalPrice: number
   discountAmount: number
+  usedBalance: number
+  usedPoints: number
+  earnedPoints: number
   finalPrice: number
   orderType: OrderType
   orderStatus: OrderStatus
+  refundStatus: RefundStatus | null
   tableNo: string
   remark: string
   couponId: string
   queueNo: number
   estimatedWaitTime: number
+  pickupCode: string
   createdAt: string
 }
+
+export type CouponType = 'all' | 'category'
 
 export interface Coupon {
   id: string
@@ -88,6 +96,11 @@ export interface Coupon {
   validDays: number
   isUsed: boolean
   expiredAt: string
+  couponType: CouponType
+  categoryId?: string
+  categoryName?: string
+  requiredPoints: number
+  isCollected: boolean
 }
 
 export interface Review {

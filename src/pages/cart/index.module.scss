@@ -185,3 +185,79 @@
 .couponDetailValue {
   font-weight: $font-weight-bold;
 }
+
+.couponSectionLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  padding: $spacing-sm 0 $spacing-xs;
+  display: block;
+}
+
+.balanceInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+}
+
+.balanceLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.toggleSwitch {
+  width: 88rpx;
+  height: 48rpx;
+  border-radius: 24rpx;
+  background: $color-divider;
+  position: relative;
+  transition: all $transition-base;
+}
+
+.toggleSwitchOn {
+  background: $color-primary;
+}
+
+.toggleDot {
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background: $color-text-white;
+  transition: all $transition-base;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+
+.toggleDotOn {
+  left: 44rpx;
+}
+
+.balanceInputRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: 0 $page-padding $spacing-md;
+}
+
+.balanceInput {
+  flex: 1;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+}
+
+.balanceHint {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.totalSub {
+  font-size: $font-size-xs;
+  color: $color-success;
+  display: block;
+}

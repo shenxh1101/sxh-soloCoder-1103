@@ -369,3 +369,100 @@
   color: $color-tag-text;
   font-weight: $font-weight-medium;
 }
+
+.assetRow {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 4rpx;
+}
+
+.assetItem {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: $font-weight-medium;
+}
+
+.refundTag {
+  display: inline-flex;
+  padding: 4rpx 16rpx;
+  background: #FFF7EB;
+  border-radius: $radius-xs;
+  margin-top: -16rpx;
+  margin-left: 32rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.refundTagText {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
+
+.couponCenterTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.collectBtn {
+  position: absolute;
+  bottom: 24rpx;
+  right: 24rpx;
+  padding: 8rpx 24rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  z-index: 2;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.collectBtnDisabled {
+  background: $color-text-disabled;
+}
+
+.collectBtnText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.pointsCard {
+  background: linear-gradient(135deg, $color-accent 0%, $color-accent-light 100%);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.pointsTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  display: block;
+}
+
+.pointsDesc {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 8rpx;
+  display: block;
+}
+
+.exchangedBtn {
+  position: absolute;
+  bottom: 24rpx;
+  right: 24rpx;
+  padding: 8rpx 24rpx;
+  background: $color-bg-page;
+  border-radius: $radius-button;
+  z-index: 2;
+}
+
+.exchangedBtnText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

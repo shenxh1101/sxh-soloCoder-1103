@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import styles from './index.module.scss'
 import { useStore } from '@/store/useStore'
 import { dishes } from '@/data/dishes'
-import { coupons } from '@/data/coupons'
+import { coupons, exchangeableCoupons } from '@/data/coupons'
 import DishCard from '@/components/DishCard'
 import CouponCard from '@/components/CouponCard'
 import ReviewCard from '@/components/ReviewCard'
@@ -13,7 +13,7 @@ import OrderCard from '@/components/OrderCard'
 import EmptyState from '@/components/EmptyState'
 import { OrderStatus } from '@/types'
 
-type MainTab = 'coupons' | 'favorites' | 'reviews' | 'orders'
+type MainTab = 'coupons' | 'favorites' | 'reviews' | 'orders' | 'points'
 
 const orderStatusFilters: { key: OrderStatus | 'all'; label: string }[] = [
   { key: 'all', label: '全部' },
@@ -43,9 +43,15 @@ const MemberPage: React.FC = () => {
     toggleStaffMode,
     addReview,
     usedCouponIds,
+    collectedCouponIds,
+    exchangeableCouponIds,
     hasReviewed,
     addReviewedKey,
     reorder,
+    points,
+    balance,
+    exchangePointsForCoupon,
+    collectCoupon,
   } = useStore()
 
   const [activeTab, setActiveTab] = useState<MainTab>('orders')
@@ -71,9 +77,10 @@ const MemberPage: React.FC = () => {
       (c) =>
         !c.isUsed &&
         !usedCouponIds.includes(c.id) &&
-        new Date(c.expiredAt) > new Date()
+        new Date(c.expiredAt) > new Date() &&
+        collectedCouponIds.includes(c.id)
     )
-  }, [usedCouponIds])
+  }, [usedCouponIds, collectedCouponIds])
 
   const usedCoupons = useMemo(() => {
     return coupons.filter(
@@ -95,6 +102,16 @@ const MemberPage: React.FC = () => {
     if (couponTab === 'used') return usedCoupons
     return expiredCoupons
   }, [couponTab, availableCoupons, usedCoupons, expiredCoupons])
+
+  const uncollectedCoupons = useMemo(() => {
+    return coupons.filter(
+      (c) =>
+        !c.isUsed &&
+        !usedCouponIds.includes(c.id) &&
+        new Date(c.expiredAt) > new Date() &&
+        !collectedCouponIds.includes(c.id)
+    )
+  }, [usedCouponIds, collectedCouponIds])
 
   const handleStaffClick = () => {
     toggleStaffMode()
@@ -143,6 +160,20 @@ const MemberPage: React.FC = () => {
     Taro.navigateTo({ url: `/pages/detail/index?id=${dishId}` })
   }
 
+  const handleExchange = (pointsCost: number, couponId: string) => {
+    if (points < pointsCost) {
+      Taro.showToast({ title: '积分不足', icon: 'none' })
+      return
+    }
+    exchangePointsForCoupon(pointsCost, couponId)
+    Taro.showToast({ title: '兑换成功！', icon: 'success' })
+  }
+
+  const handleCollect = (couponId: string) => {
+    collectCoupon(couponId)
+    Taro.showToast({ title: '领取成功！', icon: 'success' })
+  }
+
   return (
     <View className={styles.page}>
       <View className={styles.profileHeader}>
@@ -154,24 +185,10 @@ const MemberPage: React.FC = () => {
         <View className={styles.profileInfo}>
           <Text className={styles.nickname}>美食达人</Text>
           <Text className={styles.level}>黄金会员</Text>
-          <Text className={styles.memberBadge}>累计消费 ¥{orders.reduce((s, o) => s + o.finalPrice, 0).toFixed(0)}</Text>
-        </View>
-      </View>
-
-      <View className={styles.statsGrid}>
-        <View className={styles.statItem}>
-          <Text className={styles.statValue}>{orders.filter((o) => o.orderStatus === 'completed').length}</Text>
-          <Text className={styles.statLabel}>已完成</Text>
-        </View>
-        <View className={styles.statDivider} />
-        <View className={styles.statItem}>
-          <Text className={styles.statValue}>{availableCoupons.length}</Text>
-          <Text className={styles.statLabel}>可用优惠券</Text>
-        </View>
-        <View className={styles.statDivider} />
-        <View className={styles.statItem}>
-          <Text className={styles.statValue}>{favoriteIds.length}</Text>
-          <Text className={styles.statLabel}>收藏菜品</Text>
+          <View className={styles.assetRow}>
+            <Text className={styles.assetItem}>🧧 {points} 积分</Text>
+            <Text className={styles.assetItem}>💰 ¥{balance.toFixed(0)} 余额</Text>
+          </View>
         </View>
       </View>
 
@@ -200,6 +217,19 @@ const MemberPage: React.FC = () => {
             </View>
             <View className={styles.menuRight}>
               <Text className={styles.menuBadge}>{availableCoupons.length}张</Text>
+              <Text className={styles.menuArrow}>›</Text>
+            </View>
+          </View>
+          <View
+            className={styles.menuItem}
+            onClick={() => setActiveTab('points')}
+          >
+            <View className={styles.menuLeft}>
+              <Text className={styles.menuIcon}>🎁</Text>
+              <Text className={styles.menuText}>积分兑券</Text>
+            </View>
+            <View className={styles.menuRight}>
+              <Text className={styles.menuBadge}>{points}分</Text>
               <Text className={styles.menuArrow}>›</Text>
             </View>
           </View>
@@ -254,13 +284,20 @@ const MemberPage: React.FC = () => {
               {filteredOrders.map((order) => (
                 <View key={order.id}>
                   <OrderCard order={order} onDetail={handleOrderDetail} />
+                  {order.refundStatus && (
+                    <View className={styles.refundTag}>
+                      <Text className={styles.refundTagText}>
+                        {order.refundStatus === 'pending' ? '退款审核中' :
+                         order.refundStatus === 'approved' ? '退款已通过' :
+                         order.refundStatus === 'rejected' ? '退款已拒绝' : '已退款'}
+                      </Text>
+                    </View>
+                  )}
                   {order.orderStatus === 'completed' && (
                     <View style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 0 }}>
                       {reviewingOrderId === order.id ? (
                         <View className={styles.reviewForm}>
-                          <Text className={styles.reviewFormTitle}>
-                            评价 {reviewingDishName}
-                          </Text>
+                          <Text className={styles.reviewFormTitle}>评价 {reviewingDishName}</Text>
                           <View className={styles.starRow}>
                             {[1, 2, 3, 4, 5].map((star) => (
                               <Text
@@ -281,16 +318,10 @@ const MemberPage: React.FC = () => {
                             maxlength={200}
                           />
                           <View className={styles.reviewActions}>
-                            <View
-                              className={styles.reviewCancelBtn}
-                              onClick={() => setReviewingOrderId(null)}
-                            >
+                            <View className={styles.reviewCancelBtn} onClick={() => setReviewingOrderId(null)}>
                               <Text>取消</Text>
                             </View>
-                            <View
-                              className={styles.reviewSubmitBtn}
-                              onClick={submitReview}
-                            >
+                            <View className={styles.reviewSubmitBtn} onClick={submitReview}>
                               <Text>提交评价</Text>
                             </View>
                           </View>
@@ -352,7 +383,6 @@ const MemberPage: React.FC = () => {
               </View>
             ))}
           </View>
-
           <View style={{ padding: '0 32rpx' }}>
             {displayCoupons.length > 0 ? (
               displayCoupons.map((c) => (
@@ -362,6 +392,53 @@ const MemberPage: React.FC = () => {
               <EmptyState icon="🎫" title={`暂无${couponTabs.find((t) => t.key === couponTab)?.label}优惠券`} />
             )}
           </View>
+          {couponTab === 'available' && uncollectedCoupons.length > 0 && (
+            <View style={{ padding: '0 32rpx', marginTop: '16rpx' }}>
+              <Text className={styles.couponCenterTitle}>领券中心</Text>
+              {uncollectedCoupons.map((c) => (
+                <View key={c.id} style={{ position: 'relative' }}>
+                  <CouponCard coupon={c} usedCouponIds={usedCouponIds} />
+                  <View className={styles.collectBtn} onClick={() => handleCollect(c.id)}>
+                    <Text className={styles.collectBtnText}>领取</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      )}
+
+      {activeTab === 'points' && (
+        <View style={{ padding: '0 32rpx' }}>
+          <View className={styles.pointsCard}>
+            <Text className={styles.pointsTitle}>积分兑换优惠券</Text>
+            <Text className={styles.pointsDesc}>当前积分：{points}</Text>
+          </View>
+          {exchangeableCoupons.map((c) => {
+            const alreadyExchanged = exchangeableCouponIds.includes(c.id)
+            return (
+              <View key={c.id} style={{ position: 'relative' }}>
+                <CouponCard coupon={c} usedCouponIds={alreadyExchanged ? [c.id] : []} />
+                {alreadyExchanged ? (
+                  <View className={styles.exchangedBtn}>
+                    <Text className={styles.exchangedBtnText}>已兑换</Text>
+                  </View>
+                ) : (
+                  <View
+                    className={classnames(
+                      styles.collectBtn,
+                      points < c.requiredPoints && styles.collectBtnDisabled
+                    )}
+                    onClick={() => handleExchange(c.requiredPoints, c.id)}
+                  >
+                    <Text className={styles.collectBtnText}>
+                      {points >= c.requiredPoints ? `${c.requiredPoints}积分兑换` : '积分不足'}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )
+          })}
         </View>
       )}
 

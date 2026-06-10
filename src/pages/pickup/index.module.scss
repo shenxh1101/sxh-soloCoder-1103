@@ -285,3 +285,119 @@
   font-size: $font-size-md;
   color: $color-text-tertiary;
 }
+
+.pickupCodeSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 24rpx 0;
+}
+
+.pickupCodeLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pickupCode {
+  font-size: 120rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  letter-spacing: 24rpx;
+  line-height: 1.3;
+}
+
+.pickupCodeTip {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 8rpx;
+}
+
+.costBreakdown {
+  padding: $spacing-sm 0;
+  border-top: 1rpx solid $color-divider;
+  margin-top: $spacing-sm;
+}
+
+.costRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rpx 0;
+}
+
+.costLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.costValue {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.costDiscount {
+  font-size: $font-size-xs;
+  color: $color-success;
+}
+
+.costPoints {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.refundBanner {
+  margin: $spacing-md $page-padding;
+  padding: $spacing-md;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg-card;
+  text-align: center;
+}
+
+.refundBannerText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.actionArea {
+  margin: $spacing-md $page-padding;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.urgeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, $color-warning 0%, #FFA040 100%);
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.refundBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  background: $color-error;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
