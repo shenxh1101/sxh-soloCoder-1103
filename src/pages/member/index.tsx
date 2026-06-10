@@ -73,7 +73,8 @@ const MemberPage: React.FC = () => {
   }, [orders, orderFilter])
 
   const availableCoupons = useMemo(() => {
-    return coupons.filter(
+    const allCoupons = [...coupons, ...exchangeableCoupons]
+    return allCoupons.filter(
       (c) =>
         !c.isUsed &&
         !usedCouponIds.includes(c.id) &&
@@ -83,13 +84,15 @@ const MemberPage: React.FC = () => {
   }, [usedCouponIds, collectedCouponIds])
 
   const usedCoupons = useMemo(() => {
-    return coupons.filter(
+    const allCoupons = [...coupons, ...exchangeableCoupons]
+    return allCoupons.filter(
       (c) => c.isUsed || usedCouponIds.includes(c.id)
     )
   }, [usedCouponIds])
 
   const expiredCoupons = useMemo(() => {
-    return coupons.filter(
+    const allCoupons = [...coupons, ...exchangeableCoupons]
+    return allCoupons.filter(
       (c) =>
         !c.isUsed &&
         !usedCouponIds.includes(c.id) &&

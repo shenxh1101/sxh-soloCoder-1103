@@ -4,11 +4,12 @@ import Taro from '@tarojs/taro'
 import classnames from 'classnames'
 import styles from './index.module.scss'
 import { useStore } from '@/store/useStore'
-import { coupons } from '@/data/coupons'
+import { coupons, exchangeableCoupons } from '@/data/coupons'
 import { dishes } from '@/data/dishes'
 import CartItem from '@/components/CartItem'
 import CouponCard from '@/components/CouponCard'
 import EmptyState from '@/components/EmptyState'
+import { Coupon } from '@/types'
 import { formatPrice } from '@/utils'
 
 const CartPage: React.FC = () => {
@@ -43,33 +44,36 @@ const CartPage: React.FC = () => {
     return ids
   }, [cartItems])
 
+  const allCoupons = useMemo(() => [...coupons, ...exchangeableCoupons], [])
+
   const selectedCoupon = useMemo(() => {
-    return coupons.find((c) => c.id === selectedCouponId) || null
-  }, [selectedCouponId])
+    return allCoupons.find((c) => c.id === selectedCouponId) || null
+  }, [selectedCouponId, allCoupons])
 
   const discountAmount = selectedCoupon ? selectedCoupon.discountAmount : 0
   const afterDiscount = Math.max(0, total - discountAmount)
   const finalPrice = Math.max(0, afterDiscount - useBalance)
 
   const allAvailableCoupons = useMemo(() => {
-    return coupons.filter(
+    return allCoupons.filter(
       (c) =>
         !c.isUsed &&
         !usedCouponIds.includes(c.id) &&
         new Date(c.expiredAt) > new Date() &&
         collectedCouponIds.includes(c.id)
     )
-  }, [usedCouponIds, collectedCouponIds])
+  }, [usedCouponIds, collectedCouponIds, allCoupons])
 
   const matchingCoupons = useMemo(() => {
     return allAvailableCoupons.filter((c) => {
+      if (total < c.minOrderAmount) return false
       if (c.couponType === 'all') return true
       if (c.couponType === 'category' && c.categoryId) {
         return cartCategoryIds.has(c.categoryId)
       }
       return false
     })
-  }, [allAvailableCoupons, cartCategoryIds])
+  }, [allAvailableCoupons, cartCategoryIds, total])
 
   const nonMatchingCoupons = useMemo(() => {
     return allAvailableCoupons.filter((c) => {
@@ -124,7 +128,7 @@ const CartPage: React.FC = () => {
     })
   }
 
-  const handleCouponSelect = (coupon: typeof coupons[0]) => {
+  const handleCouponSelect = (coupon: Coupon) => {
     const isUsed = coupon.isUsed || usedCouponIds.includes(coupon.id)
     const isExpired = new Date(coupon.expiredAt) < new Date()
     if (isUsed || isExpired) return
@@ -152,7 +156,7 @@ const CartPage: React.FC = () => {
     }
   }
 
-  const getDisabledReason = (coupon: typeof coupons[0]): string => {
+  const getDisabledReason = (coupon: Coupon): string => {
     if (coupon.couponType === 'category' && coupon.categoryId && !cartCategoryIds.has(coupon.categoryId)) {
       return `限${coupon.categoryName || '指定品类'}使用`
     }

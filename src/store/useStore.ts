@@ -335,11 +335,16 @@ export const useStore = create<StoreState>()(
       },
 
       exchangePointsForCoupon: (points, couponId) => {
-        set((state) => ({
-          points: state.points - points,
-          collectedCouponIds: [...state.collectedCouponIds, couponId],
-          exchangeableCouponIds: [...state.exchangeableCouponIds, couponId],
-        }))
+        set((state) => {
+          if (state.exchangeableCouponIds.includes(couponId)) return state
+          return {
+            points: state.points - points,
+            collectedCouponIds: state.collectedCouponIds.includes(couponId)
+              ? state.collectedCouponIds
+              : [...state.collectedCouponIds, couponId],
+            exchangeableCouponIds: [...state.exchangeableCouponIds, couponId],
+          }
+        })
       },
 
       collectCoupon: (couponId) => {
