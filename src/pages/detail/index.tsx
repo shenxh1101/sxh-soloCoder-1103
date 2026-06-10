@@ -28,7 +28,7 @@ const DetailPage: React.FC = () => {
     )
   }
 
-  const isSold = dish.isSoldOut || soldOutIds.includes(dish.id)
+  const isSold = soldOutIds.includes(dish.id)
   const selectedSpec = dish.specs.find((s) => s.id === selectedSpecId) || dish.specs[0]
   const extraPrice = dish.extras
     .filter((e) => selectedExtraIds.includes(e.id))

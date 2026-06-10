@@ -89,3 +89,9 @@
   padding: 4rpx 16rpx;
   border-radius: 0 $radius-md 0 $radius-md;
 }
+
+.gapHint {
+  font-size: $font-size-xs;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}

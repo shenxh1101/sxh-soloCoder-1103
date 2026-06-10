@@ -12,6 +12,10 @@ function generateOrderNo(): string {
   return `${date}${seq}`
 }
 
+function makeReviewedKey(orderId: string, dishId: string): string {
+  return `${orderId}_${dishId}`
+}
+
 interface StoreState {
   cartItems: CartDishItem[]
   orders: Order[]
@@ -23,6 +27,7 @@ interface StoreState {
   isStaffMode: boolean
   soldOutIds: string[]
   usedCouponIds: string[]
+  reviewedKeys: string[]
 
   addToCart: (item: Omit<CartDishItem, 'id'>) => void
   removeFromCart: (id: string) => void
@@ -41,6 +46,9 @@ interface StoreState {
   updateOrderStatus: (orderId: string, status: Order['orderStatus']) => void
   toggleSoldOut: (dishId: string) => void
   isSoldOut: (dishId: string) => boolean
+  addReviewedKey: (orderId: string, dishId: string) => void
+  hasReviewed: (orderId: string, dishId: string) => boolean
+  reorder: (order: Order) => void
 }
 
 export const useStore = create<StoreState>((set, get) => ({
@@ -54,8 +62,13 @@ export const useStore = create<StoreState>((set, get) => ({
   isStaffMode: false,
   soldOutIds: ['12'],
   usedCouponIds: [],
+  reviewedKeys: [],
 
   addToCart: (item) => {
+    const state = get()
+    if (state.soldOutIds.includes(item.dishId)) {
+      return
+    }
     set((state) => {
       const existingIndex = state.cartItems.findIndex(
         (ci) =>
@@ -196,4 +209,52 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   isSoldOut: (dishId) => get().soldOutIds.includes(dishId),
+
+  addReviewedKey: (orderId, dishId) => {
+    const key = makeReviewedKey(orderId, dishId)
+    set((state) => ({
+      reviewedKeys: state.reviewedKeys.includes(key)
+        ? state.reviewedKeys
+        : [...state.reviewedKeys, key],
+    }))
+  },
+
+  hasReviewed: (orderId, dishId) => {
+    return get().reviewedKeys.includes(makeReviewedKey(orderId, dishId))
+  },
+
+  reorder: (order) => {
+    set((state) => {
+      const newItems = order.items.map((item) => ({
+        dishId: item.dishId,
+        name: item.name,
+        image: item.image,
+        specId: item.specId,
+        specName: item.specName,
+        extraIds: item.extraIds,
+        extraNames: item.extraNames,
+        price: item.price,
+        quantity: item.quantity,
+      }))
+
+      newItems.forEach((ni) => {
+        if (state.soldOutIds.includes(ni.dishId)) {
+          return
+        }
+        const existingIndex = state.cartItems.findIndex(
+          (ci) =>
+            ci.dishId === ni.dishId &&
+            ci.specId === ni.specId &&
+            JSON.stringify([...ci.extraIds].sort()) === JSON.stringify([...ni.extraIds].sort())
+        )
+        if (existingIndex >= 0) {
+          state.cartItems[existingIndex].quantity += ni.quantity
+        } else {
+          state.cartItems.push({ ...ni, id: generateId() })
+        }
+      })
+
+      return { cartItems: [...state.cartItems] }
+    })
+  },
 }))

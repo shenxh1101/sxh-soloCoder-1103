@@ -39,9 +39,12 @@ const CartPage: React.FC = () => {
 
   const availableCoupons = useMemo(() => {
     return coupons.filter(
-      (c) => !c.isUsed && !usedCouponIds.includes(c.id) && new Date(c.expiredAt) > new Date() && total >= c.minOrderAmount
+      (c) =>
+        !c.isUsed &&
+        !usedCouponIds.includes(c.id) &&
+        new Date(c.expiredAt) > new Date()
     )
-  }, [total, usedCouponIds])
+  }, [usedCouponIds])
 
   useEffect(() => {
     if (selectedCouponId && selectedCoupon) {
@@ -79,6 +82,18 @@ const CartPage: React.FC = () => {
   }
 
   const handleCouponSelect = (coupon: typeof coupons[0]) => {
+    const isUsed = coupon.isUsed || usedCouponIds.includes(coupon.id)
+    const isExpired = new Date(coupon.expiredAt) < new Date()
+    if (isUsed || isExpired) return
+
+    if (total < coupon.minOrderAmount) {
+      Taro.showToast({
+        title: `还差${formatPrice(coupon.minOrderAmount - total)}可用`,
+        icon: 'none',
+      })
+      return
+    }
+
     if (selectedCouponId === coupon.id) {
       selectCoupon('')
     } else {
@@ -165,6 +180,8 @@ const CartPage: React.FC = () => {
                       coupon={c}
                       selected={c.id === selectedCouponId}
                       onSelect={handleCouponSelect}
+                      totalPrice={total}
+                      usedCouponIds={usedCouponIds}
                     />
                   ))
                 ) : (

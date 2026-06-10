@@ -305,3 +305,67 @@
   color: $color-primary;
   font-weight: $font-weight-medium;
 }
+
+.reviewedBadge {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  flex-shrink: 0;
+}
+
+.reviewedBadgeText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.filterRow {
+  display: flex;
+  padding: $spacing-sm $page-padding;
+  gap: 12rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filterTab {
+  padding: 10rpx 24rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: $color-bg-page;
+  white-space: nowrap;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.filterTabActive {
+  background: $color-primary;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.reorderBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 24rpx;
+  border-radius: $radius-button;
+  background: $color-tag-bg;
+  margin-top: $spacing-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.reorderBtnText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  font-weight: $font-weight-medium;
+}

@@ -32,6 +32,13 @@ const HomePage: React.FC = () => {
     console.log('[Home] search clicked')
   }
 
+  const displayDishes = useMemo(() => {
+    return filteredDishes.map((dish) => ({
+      ...dish,
+      isSoldOut: soldOutIds.includes(dish.id),
+    }))
+  }, [filteredDishes, soldOutIds])
+
   return (
     <View className={styles.page}>
       <View className={styles.header}>
@@ -68,21 +75,18 @@ const HomePage: React.FC = () => {
         onChange={setActiveCategoryId}
       />
 
-      {filteredDishes.length > 0 ? (
+      {displayDishes.length > 0 ? (
         <View className={styles.grid}>
-          {filteredDishes.map((dish) => {
-            const isSold = dish.isSoldOut || soldOutIds.includes(dish.id)
-            return (
-              <View key={dish.id} className={styles.gridItem}>
-                <DishCard
-                  dish={{ ...dish, isSoldOut: isSold }}
-                  isFavorite={favoriteIds.includes(dish.id)}
-                  onClick={handleDishClick}
-                  onFavorite={toggleFavorite}
-                />
-              </View>
-            )
-          })}
+          {displayDishes.map((dish) => (
+            <View key={dish.id} className={styles.gridItem}>
+              <DishCard
+                dish={dish}
+                isFavorite={favoriteIds.includes(dish.id)}
+                onClick={handleDishClick}
+                onFavorite={toggleFavorite}
+              />
+            </View>
+          ))}
         </View>
       ) : (
         <EmptyState icon="🍽️" title="该分类暂无菜品" />
